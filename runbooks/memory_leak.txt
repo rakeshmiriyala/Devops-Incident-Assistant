@@ -1,0 +1,18 @@
+# Memory Leak
+
+## Symptoms
+
+- Container memory usage continually increases.
+- Pods are OOMKilled.
+- Kubernetes restarts the container.
+- Application latency can increase before failure.
+
+## Investigation
+
+```bash
+kubectl describe pod <pod> -n <namespace>
+kubectl logs <pod> -n <namespace> --previous --tail=200
+kubectl get events -A --sort-by=.lastTimestamp
+```
+
+Check memory requests/limits and application metrics before changing resources.

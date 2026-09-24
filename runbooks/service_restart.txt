@@ -1,0 +1,25 @@
+# Service Restart
+
+Use this runbook when a service is unavailable or repeatedly restarting.
+
+## Investigation
+
+1. Check pod status.
+2. Check recent Kubernetes events.
+3. Describe the affected pod.
+4. Inspect current and previous container logs.
+5. Check readiness/liveness probe failures.
+6. Check dependencies such as databases and external APIs.
+
+Example commands:
+
+```bash
+kubectl get pods -A
+kubectl get events -A --sort-by=.lastTimestamp
+kubectl describe pod <pod> -n <namespace>
+kubectl logs <pod> -n <namespace> --tail=200
+kubectl logs <pod> -n <namespace> --previous --tail=200
+```
+
+Do not restart or delete workloads until the evidence and change impact
+have been reviewed.

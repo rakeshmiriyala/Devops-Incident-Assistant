@@ -1,0 +1,31 @@
+# Database Timeout
+
+## Symptoms
+
+- Application requests time out.
+- Connection pool is exhausted.
+- Database connection errors appear in application logs.
+- Kubernetes probes may fail because the application cannot reach its DB.
+
+## Investigation
+
+Check:
+
+```bash
+kubectl get pods -A
+kubectl get events -A --sort-by=.lastTimestamp
+kubectl logs <pod> -n <namespace> --tail=200
+```
+
+Review:
+
+- Database endpoint
+- Port
+- DNS resolution
+- Credentials and secrets
+- Network policies
+- Firewall/security group rules
+- Database availability
+- Connection pool limits
+
+Do not expose credentials or secret values in incident reports.

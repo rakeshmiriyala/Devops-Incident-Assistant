@@ -1238,5 +1238,3 @@ The long-term goal is to build a DevOps incident investigation assistant that co
 ```
 
 The system is designed to help DevOps engineers investigate incidents faster while keeping production infrastructure changes under human control.
-
->>>>>>> 27fb2a5 (used ollma instead openai key)

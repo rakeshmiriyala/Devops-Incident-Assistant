@@ -816,6 +816,7 @@ kubectl exec
 The Kubernetes tools focus on collecting diagnostic information.
 
 Recommended remediation commands should be reviewed and executed by an engineer.
+<<<<<<< HEAD
 
 The intended workflow is:
 
@@ -1026,3 +1027,216 @@ The long-term goal is to build a DevOps incident investigation assistant that co
 ```
 
 The system is designed to help DevOps engineers investigate incidents faster while keeping production infrastructure changes under human control.
+=======
+
+The intended workflow is:
+
+```text
+Diagnose
+   |
+   v
+Collect Evidence
+   |
+   v
+Analyze
+   |
+   v
+Recommend
+   |
+   v
+Human Review
+   |
+   v
+Remediate
+```
+
+rather than:
+
+```text
+Incident
+   |
+   v
+AI
+   |
+   v
+Automatic Production Change
+```
+
+---
+
+# Environment Variables
+
+The current Ollama implementation does not require an OpenAI API key.
+
+Therefore:
+
+```text
+OPENAI_API_KEY
+```
+
+is not required.
+
+The `.env` file should never contain credentials committed to Git.
+
+The `.gitignore` contains:
+
+```text
+.env
+.env.*
+!.env.example
+```
+
+---
+
+# Troubleshooting
+
+## Ollama Connection Refused
+
+If you see:
+
+```text
+Connection refused
+```
+
+verify that Ollama is running on Windows:
+
+```powershell
+ollama list
+```
+
+Start Ollama with:
+
+```powershell
+$env:OLLAMA_HOST="0.0.0.0:11434"
+ollama serve
+```
+
+From WSL:
+
+```bash
+curl http://172.20.0.1:11434/api/tags
+```
+
+---
+
+## LangChain Hangs While Waiting for the Model
+
+If the traceback ends around:
+
+```text
+langchain_ollama
+httpx
+_sock.recv
+```
+
+the request has reached Ollama and is waiting for model output.
+
+Try the smaller model:
+
+```python
+model="llama3.2:latest"
+```
+
+instead of:
+
+```python
+model="qwen3:8b"
+```
+
+Test:
+
+```bash
+python -c "from langchain_ollama import ChatOllama; llm=ChatOllama(model='llama3.2:latest', base_url='http://172.20.0.1:11434'); print(llm.invoke('What is Kubernetes?').content)"
+```
+
+---
+
+## kubectl Not Found
+
+If you see:
+
+```text
+kubectl is not installed or is not available in PATH
+```
+
+verify:
+
+```bash
+kubectl version --client
+```
+
+---
+
+## Kubernetes Cluster Not Available
+
+Test:
+
+```bash
+kubectl get nodes
+```
+
+If this fails, configure a Kubernetes cluster/context before running incident diagnostics.
+
+---
+
+# Future Improvements
+
+Possible future enhancements include:
+
+* Embedding-based RAG
+* Chroma / FAISS / PGVector
+* Azure AKS integration
+* AWS EKS integration
+* Prometheus metrics
+* Grafana dashboards
+* GitHub deployment history
+* Azure DevOps deployment history
+* Slack / Microsoft Teams incident notifications
+* LangSmith tracing and evaluation
+* Human approval workflows
+* Automated incident ticket generation
+* Incident timeline generation
+* Multi-agent incident investigation
+* Automated runbook recommendations
+* LLM tool calling for Kubernetes diagnostics
+* Production observability integration
+
+---
+
+# Project Goal
+
+The long-term goal is to build a DevOps incident investigation assistant that connects:
+
+```text
+                 +-------------------+
+                 | Incident Question |
+                 +---------+---------+
+                           |
+                           v
+                 +-------------------+
+                 |     LangGraph     |
+                 +---------+---------+
+                           |
+              +------------+------------+
+              |            |            |
+              v            v            v
+          Runbooks     Kubernetes   Observability
+                         Evidence       Data
+              |            |            |
+              +------------+------------+
+                           |
+                           v
+                 +-------------------+
+                 |     Local LLM     |
+                 |      Ollama       |
+                 +---------+---------+
+                           |
+                           v
+                 +-------------------+
+                 | Incident Report   |
+                 +-------------------+
+```
+
+The system is designed to help DevOps engineers investigate incidents faster while keeping production infrastructure changes under human control.
+
+>>>>>>> 27fb2a5 (used ollma instead openai key)

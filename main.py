@@ -7,10 +7,6 @@ from graph import app
 
 
 def main():
-    if not os.getenv("OPENAI_API_KEY"):
-        raise RuntimeError(
-            "OPENAI_API_KEY is not set. Create a .env file and add your API key."
-        )
 
     question = input("Ask Incident Question: ").strip()
 

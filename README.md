@@ -1,87 +1,99 @@
-# DevOps Incident Assistant
+# 🚨 DevOps Incident Assistant
 
-A LangGraph-based DevOps incident assistant that combines:
+> An AI-powered Kubernetes incident investigation assistant built with **LangGraph, LangChain, Ollama, and Kubernetes**.
 
-* Local runbook retrieval
-* Kubernetes read-only diagnostics
-* Local LLM-based incident analysis using Ollama
-* Clear separation between observed evidence and inferred root cause
-* Safe, non-destructive Kubernetes investigation
+DevOps Incident Assistant combines **local runbooks**, **live Kubernetes diagnostics**, and a **local LLM** to investigate infrastructure incidents and generate structured incident analysis.
 
 ---
 
-# Architecture
+## ✨ Features
+
+* 🔎 **Runbook Retrieval** — Finds relevant troubleshooting knowledge from local runbooks.
+* ☸️ **Kubernetes Diagnostics** — Collects pod, event, description, and log information.
+* 🧠 **Local LLM Analysis** — Uses Ollama to analyze incident evidence.
+* 📋 **Structured Reports** — Generates classification, root cause, evidence, fixes, and verification steps.
+* 🛡️ **Read-Only Diagnostics** — Does not automatically modify Kubernetes resources.
+* 🔐 **No OpenAI API Key Required** — Runs using local Ollama models.
+
+---
+
+## 🏗️ Architecture
 
 ```text
                          User
-                           |
-                           v
-                        main.py
-                           |
-                           v
-                       LangGraph
-                           |
-            +--------------+--------------+
-            |              |              |
-            v              v              v
-         RAG Node      Kubernetes Node   Analysis Node
-            |              |              |
-            v              v              v
-      Local Runbooks   kubectl tools    Ollama LLM
-                           |           llama3.2 / qwen3
-                           |
-              +------------+------------+
-              |
-              +--> get pods
-              +--> get events
-              +--> describe pod
-              +--> pod logs
-                           |
-                           v
+                          |
+                          v
+                  Incident Question
+                          |
+                          v
+                     LangGraph
+                          |
+             +------------+------------+
+             |            |            |
+             v            v            v
+          RAG Node   Kubernetes Node  Analysis Node
+             |            |            |
+             v            v            v
+        Runbooks       kubectl       Ollama LLM
+             |            |            |
+             +------------+------------+
+                          |
+                          v
                   Incident Analysis
 ```
 
-## Request Flow
+### Investigation Flow
 
 ```text
-User Incident Question
-        |
-        v
-    RAG Node
-        |
-        +--> Search local runbooks
-        |
-        v
- Kubernetes Node
-        |
-        +--> kubectl get pods
-        +--> kubectl get events
-        +--> kubectl describe pod
-        +--> kubectl logs
-        |
-        v
- Analysis Node
-        |
-        +--> Local Ollama LLM
-        |
-        v
- Incident Analysis
-        |
-        +--> Incident Classification
-        +--> Root Cause
-        +--> Evidence
-        +--> Recommended Fix
-        +--> Verification Steps
-        +--> Preventive Measures
+Incident Question
+       |
+       v
+Retrieve Runbook
+       |
+       v
+Collect Kubernetes Evidence
+       |
+       +--> Pods
+       +--> Events
+       +--> Describe Pod
+       +--> Logs
+       |
+       v
+LLM Analysis
+       |
+       v
+Incident Report
+       |
+       +--> Classification
+       +--> Root Cause
+       +--> Evidence
+       +--> Recommended Fix
+       +--> Verification
+       +--> Prevention
 ```
 
 ---
 
-# Project Structure
+## 🛠️ Tech Stack
+
+| Component         | Technology                    |
+| ----------------- | ----------------------------- |
+| Language          | Python                        |
+| Agent Framework   | LangGraph                     |
+| LLM Framework     | LangChain                     |
+| Local LLM Runtime | Ollama                        |
+| Models            | `llama3.2`, `qwen3:8b`        |
+| Kubernetes        | kubectl                       |
+| RAG               | Local keyword-based retrieval |
+| Environment       | Linux / WSL / Windows         |
+
+---
+
+## 📁 Project Structure
 
 ```text
 Devops-Incident-Assistant/
-
+│
 ├── main.py
 ├── graph.py
 ├── tools.py
@@ -111,52 +123,38 @@ Devops-Incident-Assistant/
 
 ---
 
-# Technology Stack
+# 🚀 Getting Started
 
-| Component         | Technology                            |
-| ----------------- | ------------------------------------- |
-| Language          | Python                                |
-| Agent Framework   | LangGraph                             |
-| LLM Framework     | LangChain                             |
-| Local LLM Runtime | Ollama                                |
-| LLM               | `llama3.2:latest` / `qwen3:8b`        |
-| Kubernetes        | kubectl                               |
-| RAG               | Local keyword-based runbook retrieval |
-| Infrastructure    | Kubernetes                            |
-| Environment       | Linux / WSL / Windows                 |
+## Prerequisites
 
----
-
-# Prerequisites
-
-Install the following before running the project:
+Make sure you have:
 
 * Python 3.10+
 * Git
-* Kubernetes `kubectl`
-* A configured Kubernetes cluster
+* Kubernetes
+* `kubectl`
 * Ollama
-* A locally available Ollama model
-
-The project can run without an OpenAI API key.
+* A running/configured Kubernetes cluster
 
 ---
-
-# Setup
 
 ## 1. Clone the Repository
 
 ```bash
-git clone https://github.com/rakeshmiriyala/Devops-Incident-Assistant.git
-cd Devops-Incident-Assistant
+git clone https://github.com/rakeshmiriyala/devops-incident-assistant.git
+
+cd devops-incident-assistant
 ```
 
-## 2. Create a Python Virtual Environment
+---
+
+## 2. Create a Virtual Environment
 
 ### Linux / WSL / macOS
 
 ```bash
 python3 -m venv .venv
+
 source .venv/bin/activate
 ```
 
@@ -164,16 +162,11 @@ source .venv/bin/activate
 
 ```powershell
 python -m venv .venv
+
 .venv\Scripts\Activate.ps1
 ```
 
-You should see:
-
-```text
-(.venv)
-```
-
-in your terminal.
+---
 
 ## 3. Install Dependencies
 
@@ -181,46 +174,27 @@ in your terminal.
 pip install -r requirements.txt
 ```
 
-Current dependencies:
-
-```text
-langchain-core
-langgraph
-langchain-ollama
-python-dotenv
-```
-
 ---
 
-# Ollama Configuration
+# 🧠 Ollama Setup
 
-This project uses **Ollama** instead of OpenAI.
+This project uses **Ollama** for local LLM inference.
 
-Therefore, an OpenAI API key is not required.
+No OpenAI API key is required.
 
-## 1. Install Ollama
-
-Verify the installation:
-
-```bash
-ollama --version
-```
-
-## 2. Pull an LLM
-
-The project can use:
+### Pull a Model
 
 ```bash
 ollama pull llama3.2
 ```
 
-or:
+Or:
 
 ```bash
 ollama pull qwen3:8b
 ```
 
-Check installed models:
+Verify:
 
 ```bash
 ollama list
@@ -229,146 +203,14 @@ ollama list
 Example:
 
 ```text
-NAME               SIZE
-llama3.2:latest    2.0 GB
-qwen3:8b           5.2 GB
+NAME
+llama3.2:latest
+qwen3:8b
 ```
 
 ---
 
-# Running Ollama with WSL
-
-If the Python application runs inside WSL while Ollama runs on Windows, configure Ollama to accept connections from WSL.
-
-Open **Windows PowerShell**:
-
-```powershell
-$env:OLLAMA_HOST="0.0.0.0:11434"
-ollama serve
-```
-
-Keep this PowerShell window running.
-
-Ollama should show something similar to:
-
-```text
-OLLAMA_HOST:http://0.0.0.0:11434
-Listening on [::]:11434
-```
-
-## Find the WSL Gateway
-
-From WSL:
-
-```bash
-ip route
-```
-
-Example:
-
-```text
-default via 172.20.0.1 dev eth0
-```
-
-In this example, Ollama can be reached through:
-
-```text
-http://172.20.0.1:11434
-```
-
-## Test Ollama Connectivity
-
-From WSL:
-
-```bash
-curl http://172.20.0.1:11434/api/tags
-```
-
-If successful, the response contains the installed models.
-
-For example:
-
-```json
-{
-  "models": [
-    {
-      "name": "qwen3:8b"
-    },
-    {
-      "name": "llama3.2:latest"
-    }
-  ]
-}
-```
-
----
-
-# Configure the LLM
-
-The LLM configuration is located in:
-
-```text
-graph.py
-```
-
-Example using `llama3.2`:
-
-```python
-llm = ChatOllama(
-    model="llama3.2:latest",
-    base_url="http://172.20.0.1:11434",
-    temperature=0,
-)
-```
-
-Example using Qwen3:
-
-```python
-llm = ChatOllama(
-    model="qwen3:8b",
-    base_url="http://172.20.0.1:11434",
-    temperature=0,
-)
-```
-
-If Ollama and the Python application are running on the same machine, the base URL can generally be:
-
-```text
-http://localhost:11434
-```
-
----
-
-# Test Ollama
-
-Before running the complete application, test the LLM connection:
-
-```bash
-python -c "from langchain_ollama import ChatOllama; llm=ChatOllama(model='llama3.2:latest', base_url='http://172.20.0.1:11434', temperature=0); print(llm.invoke('What is Kubernetes? Answer in two sentences.').content)"
-```
-
-A successful response confirms:
-
-```text
-Python
-  |
-  v
-LangChain
-  |
-  v
-Ollama
-  |
-  v
-Local LLM
-```
-
-is working.
-
----
-
-# Kubernetes Configuration
-
-The assistant uses `kubectl` for read-only diagnostics.
+# ☸️ Kubernetes Setup
 
 Verify `kubectl`:
 
@@ -376,77 +218,31 @@ Verify `kubectl`:
 kubectl version --client
 ```
 
-Verify cluster connectivity:
-
-```bash
-kubectl get pods -A
-```
-
-Check the current Kubernetes context:
+Check the current context:
 
 ```bash
 kubectl config current-context
 ```
 
-List available contexts:
+Test cluster connectivity:
 
 ```bash
-kubectl config get-contexts
+kubectl get pods -A
 ```
+
+The assistant requires access to a Kubernetes cluster so it can collect diagnostic information.
 
 ---
 
-# Kubernetes Diagnostic Tools
+# ▶️ Run the Application
 
-The assistant currently uses read-only Kubernetes commands.
-
-## Get Pods
-
-```bash
-kubectl get pods -A -o wide
-```
-
-## Get Events
-
-```bash
-kubectl get events -A --sort-by=.lastTimestamp
-```
-
-## Describe a Pod
-
-```bash
-kubectl describe pod <pod-name> -n <namespace>
-```
-
-## Get Pod Logs
-
-```bash
-kubectl logs <pod-name> -n <namespace> --tail=200
-```
-
-## Get Previous Container Logs
-
-```bash
-kubectl logs <pod-name> -n <namespace> --previous --tail=200
-```
-
----
-
-# Run the Application
-
-Activate the virtual environment:
-
-```bash
-source .venv/bin/activate
-```
-
-Run the assistant:
+Start the application:
 
 ```bash
 python main.py
 ```
 
-The application asks:
+You will be prompted with:
 
 ```text
 Ask Incident Question:
@@ -458,157 +254,21 @@ Example:
 Payment service is failing after deployment. Investigate the incident.
 ```
 
-The assistant then:
+The assistant will:
 
-1. Receives the incident question
-2. Searches local runbooks
-3. Collects Kubernetes pod information
-4. Collects Kubernetes events
-5. Identifies the affected pod
-6. Collects pod description
-7. Collects pod logs
-8. Sends the evidence to Ollama
-9. Generates an incident analysis
+```text
+1. Receive the incident
+2. Search relevant runbooks
+3. Collect Kubernetes information
+4. Analyze the collected evidence
+5. Generate an incident report
+```
 
 ---
 
-# Sample Result
+# 🔍 Kubernetes Diagnostics
 
-The following is an example of the application running against the intentionally broken `payment-service` deployment.
-
-## Input
-
-```text
-Ask Incident Question: Payment service is failing after deployment. Investigate the incident.
-```
-
-## Kubernetes Test
-
-The deployment uses an intentionally invalid image:
-
-```yaml
-image: nginx-does-not-exist:999
-```
-
-This is designed to simulate an image-pull failure.
-
-## Application Output
-
-```text
-======================================================================
-DEVOPS INCIDENT ANALYSIS
-======================================================================
-
-Incident Analysis
-
-1. Incident Classification
-
-Failed Image Pull / ImagePullBackOff incident.
-
-2. Root Cause
-
-The payment-service pod is unable to pull the configured
-container image:
-
-nginx-does-not-exist:999
-
-The image reference is invalid or the image is unavailable
-from the configured container registry.
-
-3. Evidence
-
-- The payment-service pod is failing during container startup.
-- Kubernetes reports an image-pull failure.
-- The configured image is:
-  nginx-does-not-exist:999
-- Kubernetes may transition the container through:
-  ErrImagePull
-  ImagePullBackOff
-
-4. Recommended Fix
-
-Verify the container image name and tag.
-
-Check the pod events:
-
-kubectl describe pod <pod-name> -n payments
-
-Verify that:
-
-- The image repository exists.
-- The image tag exists.
-- The registry is reachable.
-- Required registry authentication is configured.
-
-5. Verification Steps
-
-kubectl get pods -n payments
-
-kubectl describe pod <pod-name> -n payments
-
-kubectl get events -n payments --sort-by=.lastTimestamp
-
-After the image reference is corrected, verify that the pod
-reaches Running status.
-
-6. Preventive Measures
-
-- Validate container image names during CI/CD.
-- Validate image tags before deployment.
-- Use immutable image tags.
-- Add deployment validation to the pipeline.
-- Verify container registry authentication.
-```
-
-> **Note:** LLM output can vary between runs. The result above represents the expected diagnostic reasoning for the intentionally invalid image test.
-
----
-
-# Real-World Example: ImagePullBackOff
-
-Consider a Deployment containing:
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-
-metadata:
-  name: payment-service
-  namespace: payments
-
-spec:
-  replicas: 2
-
-  selector:
-    matchLabels:
-      app: payment-service
-
-  template:
-    metadata:
-      labels:
-        app: payment-service
-
-    spec:
-      containers:
-        - name: payment-service
-          image: nginx-does-not-exist:999
-          ports:
-            - containerPort: 80
-```
-
-Because the image does not exist, Kubernetes may report:
-
-```text
-ErrImagePull
-```
-
-followed by:
-
-```text
-ImagePullBackOff
-```
-
-Investigate using:
+The assistant uses read-only Kubernetes commands such as:
 
 ```bash
 kubectl get pods -A -o wide
@@ -618,85 +278,77 @@ kubectl get pods -A -o wide
 kubectl get events -A --sort-by=.lastTimestamp
 ```
 
-Then:
-
 ```bash
-kubectl describe pod <pod-name> -n payments
+kubectl describe pod <pod-name> -n <namespace>
 ```
 
-The assistant combines this Kubernetes evidence with the relevant runbook and asks the local LLM to analyze the incident.
+```bash
+kubectl logs <pod-name> -n <namespace> --tail=200
+```
+
+```bash
+kubectl logs <pod-name> -n <namespace> --previous --tail=200
+```
+
+These commands help collect the evidence required for incident investigation.
 
 ---
 
-# Real-World Example: CrashLoopBackOff
+# 📚 RAG
 
-A true `CrashLoopBackOff` occurs when a container starts but repeatedly terminates.
+The project currently uses a lightweight local RAG implementation.
 
-Example:
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-
-metadata:
-  name: payment-service
-  namespace: payments
-
-spec:
-  replicas: 1
-
-  selector:
-    matchLabels:
-      app: payment-service
-
-  template:
-    metadata:
-      labels:
-        app: payment-service
-
-    spec:
-      containers:
-        - name: payment-service
-          image: busybox:1.36
-          command:
-            - sh
-            - -c
-            - "echo Application started; exit 1"
-```
-
-The pod may eventually show:
+Runbooks are stored under:
 
 ```text
-0/1   CrashLoopBackOff
+runbooks/
 ```
 
-The assistant investigates using:
+Example runbooks:
 
-```bash
-kubectl describe pod <pod-name> -n payments
+```text
+database_timeout.txt
+memory_leak.txt
+service_restart.txt
+image_startup_failure.md
+crashloopbackoff.md
 ```
 
-```bash
-kubectl logs <pod-name> -n payments --tail=200
+### RAG Flow
+
+```text
+Incident Question
+       |
+       v
+Keyword Retrieval
+       |
+       v
+Relevant Runbook
+       |
+       v
+Kubernetes Evidence
+       |
+       v
+LLM Analysis
 ```
 
-```bash
-kubectl logs <pod-name> -n payments --previous --tail=200
+The current implementation does **not require a vector database**.
+
+Future versions can use:
+
+```text
+FAISS
+Chroma
+PGVector
 ```
 
-and:
-
-```bash
-kubectl get events -n payments --sort-by=.lastTimestamp
-```
-
-The assistant then distinguishes confirmed evidence from possible causes.
+for embedding-based retrieval.
 
 ---
 
-# Incident Analysis
+# 🧠 Incident Analysis
 
-The Analysis Node asks the LLM to produce:
+The Analysis Node generates a structured incident report containing:
 
 ```text
 1. Incident Classification
@@ -707,104 +359,108 @@ The Analysis Node asks the LLM to produce:
 6. Preventive Measures
 ```
 
-The assistant is instructed to distinguish between:
+The assistant attempts to distinguish between:
 
-## Confirmed Evidence
+### ✅ Confirmed Evidence
 
-Facts directly obtained from Kubernetes or the runbook.
-
-Example:
-
-```text
-Pod status: ImagePullBackOff
-```
-
-## Likely Cause
-
-An inference based on the available evidence.
+Information directly obtained from Kubernetes or runbooks.
 
 Example:
 
 ```text
-The deployment likely references an unavailable container image.
+Pod Status: ImagePullBackOff
 ```
 
-## Unknown
+### ⚠️ Likely Cause
 
-Information that cannot be confirmed using the available evidence.
+A conclusion inferred from the available evidence.
 
 Example:
 
 ```text
-The exact registry authentication failure cannot be confirmed
-without the Kubernetes event output.
+The deployment may reference an unavailable container image.
 ```
 
-This approach reduces the chance of presenting an LLM assumption as a confirmed infrastructure fact.
+### ❓ Unknown
+
+Information that cannot be confirmed with the available evidence.
+
+Example:
+
+```text
+The exact registry authentication problem cannot be confirmed
+without additional Kubernetes event information.
+```
+
+This helps reduce the risk of treating an LLM assumption as a confirmed infrastructure fact.
 
 ---
 
-# Local RAG
+# 🧪 Example Incident
 
-The current RAG implementation uses local runbooks stored in:
+Consider a deployment with an invalid image:
 
-```text
-runbooks/
+```yaml
+image: nginx-does-not-exist:999
 ```
 
-Current runbooks include:
+Kubernetes may report:
 
 ```text
-database_timeout.txt
-memory_leak.txt
-service_restart.txt
-image_startup_failure.md
-crashloopbackoff.md
+ErrImagePull
+ImagePullBackOff
 ```
 
-The current implementation uses lightweight keyword-based retrieval.
-
-Example:
+The assistant collects:
 
 ```text
-Payment service is failing with ImagePullBackOff
+Pod Status
+    +
+Kubernetes Events
+    +
+Pod Description
+    +
+Container Logs
+    +
+Relevant Runbook
+    |
+    v
+Local LLM
+    |
+    v
+Incident Analysis
 ```
 
-can retrieve:
+Example output:
 
 ```text
-image_startup_failure.md
+Incident Classification:
+ImagePullBackOff
+
+Root Cause:
+The configured container image is unavailable or invalid.
+
+Evidence:
+- Pod is unable to start
+- Kubernetes reports image pull failure
+- Image reference is nginx-does-not-exist:999
+
+Recommended Fix:
+Verify the image repository and tag.
+
+Verification:
+Confirm the pod reaches Running state after correction.
 ```
 
-The retrieved runbook is passed to the Analysis Node together with Kubernetes evidence.
-
-## Current RAG Flow
-
-```text
-Incident Question
-       |
-       v
-Keyword Matching
-       |
-       v
-Local Runbooks
-       |
-       v
-Top Matching Runbooks
-       |
-       v
-LLM Analysis
-```
-
-No external vector database is required.
+> The LLM response can vary between runs. Production changes should always be reviewed by an engineer.
 
 ---
 
-# Security and Safety
+# 🔐 Safety
 
-The assistant is designed as a **read-only diagnostic system**.
+The project is designed as a **diagnostic assistant**, not an autonomous production remediation system.
 
-It does not automatically execute destructive Kubernetes operations such as:
+It does not automatically execute destructive or state-changing commands such as:
 
 ```text
 kubectl delete
@@ -813,218 +469,202 @@ kubectl rollout restart
 kubectl exec
 ```
 
-The Kubernetes tools focus on collecting diagnostic information.
-
-Recommended remediation commands should be reviewed and executed by an engineer.
-<<<<<<< HEAD
-
 The intended workflow is:
 
 ```text
-Diagnose
-   |
-   v
-Collect Evidence
-   |
-   v
-Analyze
-   |
-   v
-Recommend
-   |
-   v
-Human Review
-   |
-   v
-Remediate
+       Incident
+          |
+          v
+      Diagnose
+          |
+          v
+   Collect Evidence
+          |
+          v
+       Analyze
+          |
+          v
+      Recommend
+          |
+          v
+    Human Review
+          |
+          v
+      Remediate
 ```
 
-rather than:
-
-```text
-Incident
-   |
-   v
-AI
-   |
-   v
-Automatic Production Change
-```
+This keeps production changes under human control.
 
 ---
 
-# Environment Variables
+# 🖥️ Ollama + WSL
 
-The current Ollama implementation does not require an OpenAI API key.
+If Python runs inside WSL while Ollama runs on Windows, Ollama may need to be exposed to WSL.
 
-Therefore:
+Run in Windows PowerShell:
 
-```text
-OPENAI_API_KEY
+```powershell
+$env:OLLAMA_HOST="0.0.0.0:11434"
+
+ollama serve
 ```
 
-is not required.
+Find the WSL gateway:
 
-The `.env` file should never contain credentials committed to Git.
+```bash
+ip route
+```
 
-The `.gitignore` contains:
+Example:
 
 ```text
-.env
-.env.*
-!.env.example
+default via 172.20.0.1 dev eth0
 ```
+
+Then configure the Ollama URL in the application:
+
+```python
+from langchain_ollama import ChatOllama
+
+llm = ChatOllama(
+    model="llama3.2:latest",
+    base_url="http://172.20.0.1:11434",
+    temperature=0,
+)
+```
+
+If Ollama and the application run in the same environment:
+
+```text
+http://localhost:11434
+```
+
+can generally be used.
 
 ---
 
-# Troubleshooting
+# 🔧 Troubleshooting
 
 ## Ollama Connection Refused
 
-If you see:
-
-```text
-Connection refused
-```
-
-verify that Ollama is running on Windows:
+Check Ollama:
 
 ```powershell
 ollama list
 ```
 
-Start Ollama with:
+Start it:
 
 ```powershell
 $env:OLLAMA_HOST="0.0.0.0:11434"
+
 ollama serve
 ```
 
 From WSL:
 
 ```bash
-curl http://172.20.0.1:11434/api/tags
-```
-
----
-
-## LangChain Hangs While Waiting for the Model
-
-If the traceback ends around:
-
-```text
-langchain_ollama
-httpx
-_sock.recv
-```
-
-the request has reached Ollama and is waiting for model output.
-
-Try the smaller model:
-
-```python
-model="llama3.2:latest"
-```
-
-instead of:
-
-```python
-model="qwen3:8b"
-```
-
-Test:
-
-```bash
-python -c "from langchain_ollama import ChatOllama; llm=ChatOllama(model='llama3.2:latest', base_url='http://172.20.0.1:11434'); print(llm.invoke('What is Kubernetes?').content)"
+curl http://<WSL-GATEWAY>:11434/api/tags
 ```
 
 ---
 
 ## kubectl Not Found
 
-If you see:
-
-```text
-kubectl is not installed or is not available in PATH
-```
-
-verify:
+Check:
 
 ```bash
 kubectl version --client
 ```
 
+Make sure `kubectl` is installed and available in your `PATH`.
+
 ---
 
-## Kubernetes Cluster Not Available
+## Kubernetes Connection Failed
 
-Test:
+Check:
+
+```bash
+kubectl config current-context
+```
+
+Then:
 
 ```bash
 kubectl get nodes
 ```
 
-If this fails, configure a Kubernetes cluster/context before running incident diagnostics.
+Make sure the selected Kubernetes context is available.
 
 ---
 
-# Future Improvements
+# 📈 Future Improvements
 
-Possible future enhancements include:
+Planned improvements include:
 
-* Embedding-based RAG
-* Chroma / FAISS / PGVector
-* Azure AKS integration
-* AWS EKS integration
-* Prometheus metrics
-* Grafana dashboards
-* GitHub deployment history
-* Azure DevOps deployment history
-* Slack / Microsoft Teams incident notifications
-* LangSmith tracing and evaluation
-* Human approval workflows
-* Automated incident ticket generation
-* Incident timeline generation
-* Multi-agent incident investigation
-* Automated runbook recommendations
-* LLM tool calling for Kubernetes diagnostics
-* Production observability integration
+* 🔹 Embedding-based RAG
+* 🔹 FAISS / Chroma / PGVector
+* 🔹 Azure AKS integration
+* 🔹 AWS EKS integration
+* 🔹 Prometheus integration
+* 🔹 Grafana observability
+* 🔹 GitHub deployment history
+* 🔹 Azure DevOps deployment history
+* 🔹 LangSmith tracing
+* 🔹 Slack / Microsoft Teams notifications
+* 🔹 Incident ticket generation
+* 🔹 Human approval workflows
+* 🔹 Automated incident timelines
+* 🔹 Multi-agent investigation
+* 🔹 Production observability integration
 
 ---
 
-# Project Goal
+# 🎯 Project Goal
 
-The long-term goal is to build a DevOps incident investigation assistant that connects:
+The long-term goal is to connect DevOps incident investigation with AI-assisted reasoning:
 
 ```text
-                 +-------------------+
-                 | Incident Question |
-                 +---------+---------+
-                           |
-                           v
-                 +-------------------+
-                 |     LangGraph     |
-                 +---------+---------+
-                           |
-              +------------+------------+
-              |            |            |
-              v            v            v
-          Runbooks     Kubernetes   Observability
-                         Evidence       Data
-              |            |            |
-              +------------+------------+
-                           |
-                           v
-                 +-------------------+
-                 |     Local LLM     |
-                 |      Ollama       |
-                 +---------+---------+
-                           |
-                           v
-                 +-------------------+
-                 | Incident Report   |
-                 +-------------------+
+                 Incident
+                    |
+                    v
+        +-----------------------+
+        |       LangGraph       |
+        +-----------+-----------+
+                    |
+          +---------+---------+
+          |         |         |
+          v         v         v
+      Runbooks  Kubernetes  Observability
+          |         |         |
+          +---------+---------+
+                    |
+                    v
+              Local LLM
+                Ollama
+                    |
+                    v
+          Incident Analysis
+                    |
+                    v
+            Human Review
+                    |
+                    v
+              Remediation
 ```
 
-The system is designed to help DevOps engineers investigate incidents faster while keeping production infrastructure changes under human control.
+The goal is to help DevOps engineers **investigate incidents faster while keeping production changes under human control**.
 
+---
+
+# 👨‍💻 Author
+
+**Rakesh Miriyala**
+
+GitHub:
+https://github.com/rakeshmiriyala
+
+---
+
+⭐ If you find this project useful, consider giving the repository a star.
